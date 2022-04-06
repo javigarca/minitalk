@@ -1,7 +1,4 @@
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "../include/minitalk.h"
 
 int main(void)
 //int main(int argc, char**argv)
@@ -11,10 +8,13 @@ int main(void)
 
 	num = 0;
 	id = getpid();
-	printf("ID : %d \n", id);
+	ft_putstr_fd("ID :", 1);
+	ft_putnbr_fd(id, 1);
+	ft_putstr_fd("\n", 1);
 	while (1)
 	{
-		printf("%d \n", num++);
+		ft_putnbr_fd(num++,1);
+		ft_putstr_fd("\n", 1);
 		sleep(1);
 	}
 	return(0);
