@@ -18,7 +18,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <signal.h>
-#include "../Libft/libft.h"
+#include "../libft/libft.h"
 
 void	ft_send_message(char *mess, int pid);
 
