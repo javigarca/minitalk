@@ -3,18 +3,20 @@
 void	ft_send_message(char *mess, int pid)
 {
 	int i;
-
+	
 	while (*mess)
 	{
 		i = 0;
-		while (i++ < 9)
+		while (i < 8)
 		{
-			if ((*mess & 0x01))
+			if ((*mess >> i) & 0x01)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
-			*mess >>= 1;
+			i++;
+			usleep(100);
 		}
+		mess++;
 	}
 	write(1, "Mensaje enviado.\n", 17);
 }
@@ -32,7 +34,6 @@ int main(int argc, char**argv)
 			ft_putnbr_fd(id, 1);
 			ft_putstr_fd("\n", 1);
 			ft_send_message(argv[2], id);
-	//		kill(id, SIGKILL);
 		}
 		else
 			write(1, "Escriba el número de proceso del servidor correctamente.\n", 58);
