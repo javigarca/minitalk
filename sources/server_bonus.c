@@ -10,54 +10,52 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minitalk.h"
+#include "../include/minitalk_bonus.h"
 
-void	ft_send_message(char *mess, int pid)
+void	ft_received_sig(int sig, siginfo_t *info, void *ucontext)
 {
-	int	i;
+	static int		bit;
+	static char		messrec;
+	static pid_t	client_pid;
 
-	while (*mess)
+	(void)ucontext;
+	if (client_pid != info->si_pid)
 	{
-		i = 0;
-		while (i < 8)
-		{
-			if ((*mess >> i) & 0x01)
-				kill(pid, SIGUSR2);
-			else
-				kill(pid, SIGUSR1);
-			i++;
-			usleep(500);
-		}
-		mess++;
+		messrec = 0;
+		bit = 0;
 	}
-	write(1, "\nFin del cliente.\n", 18);
-}
-
-void	ft_received_server(int sig)
-{
 	if (sig == SIGUSR2)
-		write(1, "✅", 4);
+		messrec |= (0x01 << bit);
+	if (++bit == 8)
+	{
+		write(1, &messrec, 1);
+		messrec = 0;
+		bit = 0;
+	}
+	client_pid = info->si_pid;
+	kill(info->si_pid, SIGUSR2);
 }
 
-int	main(int argc, char**argv)
+int	main(int argc, char **argv)
 {
-	int	id;
+	struct sigaction	ssg;
 
-	if (argc == 3)
+	if (argc != 1)
 	{
-		id = ft_atoi(argv[1]);
-		if (id)
-		{
-			ft_putstr_fd("Ejecutando cliente... ", 1);
-			ft_putnbr_fd(id, 1);
-			ft_putstr_fd("\n", 1);
-			signal(SIGUSR2, ft_received_server);
-			ft_send_message(argv[2], id);
-		}
-		else
-			write(1, "Escriba el pid de server correctamente.\n", 41);
+		ft_putstr_fd("El programa server no necesita argumentos. USO: ", 1);
+		ft_putstr_fd(argv[0], 1);
+		return (1);
 	}
-	else
-		write(1, "Escriba ./client, el pid de server y el mensaje.\n", 49);
+	ssg.sa_flags = SA_SIGINFO;
+	ssg.sa_sigaction = ft_received_sig;
+	ft_putstr_fd("Server PID :", 1);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putstr_fd("\n", 1);
+	sigaction(SIGUSR1, &ssg, NULL);
+	sigaction(SIGUSR2, &ssg, NULL);
+	while (42)
+	{
+		pause();
+	}
 	return (0);
 }

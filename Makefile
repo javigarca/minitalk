@@ -5,7 +5,11 @@ SDIR		=	sources/
 
 SERVER		=	$(SDIR)/server.c
 
+SER_B		=	$(SDIR)/server_bonus.c
+
 CLIENT		=	$(SDIR)/client.c
+
+CLI_B		=	$(SDIR)/client_bonus.c
 
 LIBFT		=	cd Libft && make
 
@@ -20,8 +24,19 @@ CLIENT_SRC	=	$(CLIENT)
 
 CLIENT_OBJS	=	$(CLIENT_SRC:.c=.o)
 
+SER_B_SRC	=	$(SER_B)
+
+SER_B_OBJS	=	$(SER_B_SRC:.c=.o)
+
+CLI_B_SRC	=	$(CLI_B)
+
+CLI_B_OBJS	=	$(CLI_B_SRC:.c=.o)
+
+
 OBJS		=	$(CLIENT_OBJS) \
-				$(SERVER_OBJS)
+				$(CLI_B_OBJS) \
+				$(SERVER_OBJS) \
+				$(SER_B_OBJS)
 
 # ------------------------------ Constant strings ------------------------------
 
@@ -33,7 +48,11 @@ INCLUDE		=	-I include
 
 SERVER_NAME	=	server
 
+SER_B_NAME	=	server_bonus
+
 CLIENT_NAME	=	client
+
+CLI_B_NAME	=	client_bonus
 
 NAME		=	minitalk
 
@@ -55,6 +74,10 @@ SERV_READY	=	echo "\n📥 Server ready!\n"
 
 CLI_READY	=	echo "\n📟 Client ready!\n"
 
+SER_B_READY	=	echo "\n📥 Server BONUS ready!\n"
+
+CLI_B_READY	=	echo "\n📟 Client BONUS ready!\n"
+
 CLEANED		=	echo "\n💧 $(BOLD_YELLOW)Clean: $(NO_COLOR)Removed all the \".o\" files \n"
 
 FCLEANED	=	echo "\n🧼 $(BOLD_YELLOW)Fclean: $(NO_COLOR)Removed the executables \n"
@@ -65,6 +88,8 @@ all: $(NAME)
 
 $(NAME): comp_start server client
 
+bonus: comp_start ser_b cli_b
+		 
 comp_start:
 	@$(COMP_START)
 	@$(LIBFT)
@@ -77,13 +102,21 @@ client: $(CLIENT_OBJS)
 	@$(GCC) $(FLAGS) $(CLIENT_OBJS) $(LIB) -o $(CLIENT_NAME)
 	@$(CLI_READY)
 
+ser_b: $(SER_B_OBJS)
+	@$(GCC) $(FLAGS) $(SER_B_OBJS) $(LIB) -o $(SER_B_NAME)
+	@$(SER_B_READY)
+
+cli_b: $(CLI_B_OBJS)
+	@$(GCC) $(FLAGS) $(CLI_B_OBJS) $(LIB) -o $(CLI_B_NAME)
+	@$(CLI_B_READY)
+
 clean:
 	@rm -rf $(OBJS)
 	@cd libft && make clean
 	@$(CLEANED)
 
 fclean: clean
-	@rm -rf $(SERVER_NAME) $(CLIENT_NAME)
+	@rm -rf $(SERVER_NAME) $(CLIENT_NAME) $(SER_B_NAME) $(CLI_B_NAME)
 	@cd libft && make fclean
 	@$(FCLEANED)
 
@@ -92,4 +125,4 @@ fclean: clean
 
 re:	fclean all
 
-.PHONY: all minitalk server client clean fclean re libft
+.PHONY: all minitalk server client clean fclean re libft bonus

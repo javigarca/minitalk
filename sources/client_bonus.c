@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minitalk.h"
+#include "../include/minitalk_bonus.h"
 
 void	ft_send_message(char *mess, int pid)
 {
@@ -26,7 +26,7 @@ void	ft_send_message(char *mess, int pid)
 			else
 				kill(pid, SIGUSR1);
 			i++;
-			usleep(500);
+			usleep(200);
 		}
 		mess++;
 	}
