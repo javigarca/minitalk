@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minitalk_bonus.h"
+#include "../include/minitalk.h"
 
 void	ft_received_sig(int sig, siginfo_t *info, void *ucontext)
 {
-	static int		bit;
-	static char		messrec;
-	static pid_t	client_pid;
+	static unsigned int		bit = 0 ;
+	static unsigned char	messrec = 0;
+	static pid_t			client_pid;
 
 	(void)ucontext;
 	if (client_pid != info->si_pid)
@@ -24,16 +24,21 @@ void	ft_received_sig(int sig, siginfo_t *info, void *ucontext)
 		messrec = 0;
 		bit = 0;
 	}
+	client_pid = info->si_pid;
 	if (sig == SIGUSR2)
 		messrec |= (0x01 << bit);
-	if (++bit == 8)
+	else
+		messrec += (0x00 << bit);
+	bit++;
+	if (bit == 8)
 	{
 		write(1, &messrec, 1);
 		messrec = 0;
 		bit = 0;
+		kill(client_pid, SIGUSR2);
 	}
-	client_pid = info->si_pid;
-	kill(info->si_pid, SIGUSR2);
+	else
+		kill(client_pid, SIGUSR1);
 }
 
 int	main(int argc, char **argv)

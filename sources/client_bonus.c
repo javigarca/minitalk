@@ -10,7 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minitalk_bonus.h"
+#include "../include/minitalk.h"
+
+void	ft_send_empty(int pid)
+{
+	int	i;
+
+	i = 8;
+	while (--i)
+	{
+		kill(pid, SIGUSR1);
+		usleep(800);
+	}
+}
 
 void	ft_send_message(char *mess, int pid)
 {
@@ -26,23 +38,37 @@ void	ft_send_message(char *mess, int pid)
 			else
 				kill(pid, SIGUSR1);
 			i++;
-			usleep(200);
+			usleep(800);
 		}
 		mess++;
 	}
+	ft_send_empty(pid);
 	write(1, "\nFin del cliente.\n", 18);
 }
 
-void	ft_received_server(int sig)
+void	ft_received_server(int sig, siginfo_t *info, void *ucontext)
 {
+	int static	okeys = 0;
+
+	(void)info;
+	(void)ucontext;
 	if (sig == SIGUSR2)
-		write(1, "✅", 4);
+	{
+		ft_putstr_fd("\rBytes recibidos correctamente: ", 1);
+		ft_putnbr_fd(++okeys, 1);
+	}
+	usleep(100);
 }
 
 int	main(int argc, char**argv)
 {
-	int	id;
+	int					id;
+	struct sigaction	ssg;
 
+	ssg.sa_flags = SA_SIGINFO;
+	ssg.sa_sigaction = ft_received_server;
+	sigaction(SIGUSR2, &ssg, NULL);
+	sigaction(SIGUSR1, &ssg, NULL);
 	if (argc == 3)
 	{
 		id = ft_atoi(argv[1]);
@@ -50,8 +76,9 @@ int	main(int argc, char**argv)
 		{
 			ft_putstr_fd("Ejecutando cliente... ", 1);
 			ft_putnbr_fd(id, 1);
+			ft_putstr_fd("\nBytes totales del mensaje: ", 1);
+			ft_putnbr_fd(ft_strlen(argv[2]), 1);
 			ft_putstr_fd("\n", 1);
-			signal(SIGUSR2, ft_received_server);
 			ft_send_message(argv[2], id);
 		}
 		else
