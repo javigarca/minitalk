@@ -1,6 +1,0 @@
-cambiar todos los header de los archivos
-comprobar que libft se descarga y sube bien a través de los repositorios
-descargar y pasar francinette
-pruebas en los ordenadores del cluster
-BIS
-
